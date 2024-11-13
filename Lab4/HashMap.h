@@ -14,13 +14,14 @@ private:
 	List* GetBuckets() const { return _buckets; };
 	void SetBuckets(List* newBuckets) { _buckets = newBuckets; };
 
-	uint64_t Hash(const unsigned char* x, size_t len, size_t hash_size);
+	//uint64_t Hash(const string& key, size_t hash_size);
 public:
 	HashMap(int capacity);
 	~HashMap();
 
+	uint64_t Hash(const string& key, size_t hash_size);
 	void Insert(Entry* entry);
-	char* Find(char* key);
-	void Remove(char* key);
+	string Find(string key);
+	void Remove(string key);
 };
 

@@ -32,7 +32,7 @@ void HashMap::SetElementCount(int newElementCount)
 	_elementCount = newElementCount;
 }
 
-uint64_t HashMap::Hash(const unsigned char* key, size_t len, size_t hash_size)
+uint64_t HashMap::Hash(const string& key, size_t hash_size)
 {
     // Переменная для хранения промежуточного результата вычисления хеша для каждого символа в строке x
     unsigned char h;
@@ -61,12 +61,7 @@ uint64_t HashMap::Hash(const unsigned char* key, size_t len, size_t hash_size)
 
     for (int j = 0; j < 8; ++j) {
         h = T[(key[0] + j) % 256];
-        const unsigned char* localChar = key;
-        /*while (*localChar != '\0') {
-            h = T[h ^ *localChar];
-            ++localChar;
-        }*/
-        for (int i = 1; i < len; ++i) {
+        for (int i = 1; i < key.size(); ++i) {
             // Используем оператор побитового исключающего ИЛИ для обновления хеш-значения
             h = T[h ^ key[i]];
         }

@@ -58,7 +58,7 @@ void List::Add(Entry* data)
 	}
 }
 
-void List::Remove(char* key)
+void List::Remove(string key)
 {
 	Node** prevTargetNodes = LinearSearch(key);
 	Node* prevNode = prevTargetNodes[0];
@@ -96,7 +96,7 @@ void List::Remove(char* key)
 	AddOffsetCount(-1);
 }
 
-Node** List::LinearSearch(char* key)
+Node** List::LinearSearch(string key)
 {
 	Node* prevNode = nullptr;
 	Node* currentNode = GetHead();

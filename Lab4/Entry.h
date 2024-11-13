@@ -1,10 +1,13 @@
 #pragma once
+#include "string"
+
+using namespace std;
+
 struct Entry
 {
-	Entry(char* key, char* value);
-	~Entry();
+	Entry(string key, string value);
 
-	char* Key;
-	char* Value;
+	string Key;
+	string Value;
 };
 

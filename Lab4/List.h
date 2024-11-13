@@ -21,7 +21,7 @@ public:
 
 	int GetCount() const { return _count; }
 	void Add(Entry* data);
-	void Remove(char* key);
-	Node** LinearSearch(char* element);
+	void Remove(string key);
+	Node** LinearSearch(string element);
 };
 
