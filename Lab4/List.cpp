@@ -26,16 +26,6 @@ List::~List()
 
 void List::Add(Entry* data)
 {
-	Node** prevFoundNodes = LinearSearch(data->Key);
-	Node* foundNode = prevFoundNodes[1];
-	delete[] prevFoundNodes;
-
-	if (foundNode && foundNode->GetData()->Value == data->Value)
-	{
-		delete data;
-		return;
-	}
-
 	Node* headNode = GetHead();
 	Node* tailNode = GetTail();
 
@@ -58,11 +48,56 @@ void List::Add(Entry* data)
 	}
 }
 
+void List::Remove(Node** prevTargetNodes)
+{
+	Node* prevNode = prevTargetNodes[0];
+	Node* targetNode = prevTargetNodes[1];
+	if (!targetNode)
+	{
+		return;
+	}
+	Node* nextNode = targetNode->GetNext();
+
+	if (!prevNode && !nextNode)
+	{
+		SetHead(nullptr);
+		SetTail(nullptr);
+	}
+	else if (!prevNode)
+	{
+		SetHead(nextNode);
+		if (nextNode == GetTail())
+		{
+			SetTail(nullptr);
+		}
+	}
+	else if (!nextNode)
+	{
+		prevNode->SetNext(nullptr);
+		if (targetNode != GetHead())
+		{
+			SetTail(prevNode);
+		}
+	}
+	else
+	{
+		prevNode->SetNext(nextNode);
+	}
+
+	delete targetNode;
+	AddOffsetCount(-1);
+}
+
 void List::Remove(string key)
 {
 	Node** prevTargetNodes = LinearSearch(key);
 	Node* prevNode = prevTargetNodes[0];
 	Node* targetNode = prevTargetNodes[1];
+	if (!targetNode)
+	{
+		delete[] prevTargetNodes;
+		return;
+	}
 	Node* nextNode = targetNode->GetNext();
 
 	if (!prevNode && !nextNode)
@@ -100,17 +135,15 @@ Node** List::LinearSearch(string key)
 {
 	Node* prevNode = nullptr;
 	Node* currentNode = GetHead();
-	Node** nodes = new Node*[2] { prevNode, currentNode };
 	for (int i = 0; i < GetCount(); i++)
 	{
 		if (currentNode->GetData()->Key == key)
 		{
-			return nodes;
+			return new Node * [2] { prevNode, currentNode };
 		}
 		prevNode = currentNode;
 		currentNode = currentNode->GetNext();
 	}
 
-	delete[] nodes;
-	throw runtime_error("Key not found.");
+	return new Node * [2] { nullptr, nullptr };
 }

@@ -1,12 +1,16 @@
 #include <stdexcept>
+#include <cmath>
+#include <algorithm>
 #include "HashMap.h"
 
 using namespace std;
 
-HashMap::HashMap(int capacity = 5)
+HashMap::HashMap()
 {
-	SetCapacity(capacity);
-	SetBuckets(new List[GetCapacity()]);
+	SetCapacity(4);
+    SetElementCount(0);
+    SetBuckets(new List*[GetCapacity()]);
+    fill(GetBuckets(), GetBuckets() + GetCapacity(), nullptr);
 }
 
 HashMap::~HashMap()
@@ -14,9 +18,13 @@ HashMap::~HashMap()
 	delete[] GetBuckets();
 }
 
+/// <summary>
+/// Сеттер Capacity.
+/// </summary>
+/// <param name="newCapacity">Целое не отрицательное число, степень 2.</param>
 void HashMap::SetCapacity(int newCapacity)
 {
-	if (newCapacity < 0)
+	if (newCapacity < 0 && floor(log2(newCapacity)) != log2(newCapacity))
 	{
 		throw invalid_argument("Capacity cannot be negative.");
 	}
@@ -25,15 +33,26 @@ void HashMap::SetCapacity(int newCapacity)
 
 void HashMap::SetElementCount(int newElementCount)
 {
-	if (newElementCount < 0)
+	if (newElementCount < 0 && newElementCount > GetCapacity() + 1)
 	{
 		throw invalid_argument("Capacity cannot be negative.");
 	}
 	_elementCount = newElementCount;
 }
 
+/// <summary>
+/// Хеш-функция.
+/// </summary>
+/// <param name="key">Значение, которое необходимо захешировать.</param>
+/// <param name="hash_size">Длину результирующего хеш-значения в битах.</param>
+/// <returns>Индекс массива, куда поместить элемент.</returns>
 uint64_t HashMap::Hash(const string& key, size_t hash_size)
 {
+    if (hash_size < 0 && hash_size > 64)
+    {
+        throw new invalid_argument("hash_size cannot be negative and more than 64.");
+    }
+
     // Переменная для хранения промежуточного результата вычисления хеша для каждого символа в строке x
     unsigned char h;
     // Массив из 8 байтов для хранения окончательных промежуточных значений хеша для каждого из 8 циклов.
@@ -85,4 +104,76 @@ uint64_t HashMap::Hash(const string& key, size_t hash_size)
     }
 
     return result;
+}
+
+void HashMap::Rehash()
+{
+    int oldCapacity = GetCapacity();
+    List** oldBuckets = GetBuckets();
+    int newCapacity = oldCapacity * 2;
+    SetCapacity(newCapacity);
+
+    List** newBuckets = new List * [newCapacity];
+    fill(newBuckets, newBuckets + newCapacity, nullptr);
+
+    for (int i = 0; i < oldCapacity; i++)
+    {
+        if (!oldBuckets[i]) continue;
+        Node* currentNode = oldBuckets[i]->GetHead();
+        while (currentNode != nullptr)
+        {
+            Entry* entry = currentNode->GetData();
+            size_t hash_size = (size_t)log2(newCapacity);
+            uint64_t newInsertIndex = Hash(entry->Key, hash_size);
+
+            if (!newBuckets[newInsertIndex])
+            {
+                newBuckets[newInsertIndex] = new List();
+            }
+            newBuckets[newInsertIndex]->Add(entry);
+
+            currentNode = currentNode->GetNext();
+        }
+        delete oldBuckets[i];
+    }
+    delete[] oldBuckets;
+    SetBuckets(newBuckets);
+}
+
+void HashMap::Insert(Entry* entry)
+{
+    int capacity = GetCapacity();
+    size_t hash_size = (size_t)log2(capacity);
+    uint64_t insertIndex = Hash(entry->Key, hash_size);
+    List** buckets = GetBuckets();
+
+    if (!buckets[insertIndex])
+    {
+        buckets[insertIndex] = new List();
+    }
+
+    Node** prevFoundNodes = buckets[insertIndex]->LinearSearch(entry->Key);
+    Node* foundNode = prevFoundNodes[1];
+
+    if (foundNode)
+    {
+        if (foundNode->GetData()->Value == entry->Value)
+        {
+            delete entry;
+        }
+        else
+        {
+            buckets[insertIndex]->Remove(prevFoundNodes);
+            buckets[insertIndex]->Add(entry);
+        }
+        delete[] prevFoundNodes;
+        return;
+    }
+    buckets[insertIndex]->Add(entry);
+
+    SetElementCount(GetElementCount() + 1);
+    if (GetElementCount() / capacity + 0.15 > 1.0)
+    {
+        Rehash();
+    }
 }
