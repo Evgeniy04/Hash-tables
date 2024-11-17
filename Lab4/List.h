@@ -22,7 +22,7 @@ public:
 	int GetCount() const { return _count; }
 	void Add(Entry* data);
 	void Remove(string key);
-	void Remove(Node** prevTargetNodes);
-	Node** LinearSearch(string element);
+	void Remove(Node* prevNode, Node* targetNode);
+	//Node* LinearSearch(string element);
 };
 

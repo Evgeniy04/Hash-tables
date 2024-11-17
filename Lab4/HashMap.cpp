@@ -15,6 +15,11 @@ HashMap::HashMap()
 
 HashMap::~HashMap()
 {
+    for (int i = 0; i < GetCapacity(); i++)
+    {
+        if (!GetBuckets()[i]) continue;
+        delete GetBuckets()[i];
+    }
 	delete[] GetBuckets();
 }
 
@@ -46,18 +51,21 @@ void HashMap::SetElementCount(int newElementCount)
 /// <param name="key">Значение, которое необходимо захешировать.</param>
 /// <param name="hash_size">Длину результирующего хеш-значения в битах.</param>
 /// <returns>Индекс массива, куда поместить элемент.</returns>
-uint64_t HashMap::Hash(const string& key, size_t hash_size)
+uint64_t HashMap::Hash(const string& key, int hash_size)
 {
-    if (hash_size < 0 && hash_size > 64)
+    if (hash_size < 0 || hash_size > 64)
     {
-        throw new invalid_argument("hash_size cannot be negative and more than 64.");
+        throw invalid_argument("hash_size cannot be negative and more than 64.");
+    }
+    if (key.empty()) {
+        throw invalid_argument("key cannot be empty.");
     }
 
     // Переменная для хранения промежуточного результата вычисления хеша для каждого символа в строке x
     unsigned char h;
     // Массив из 8 байтов для хранения окончательных промежуточных значений хеша для каждого из 8 циклов.
     // Эти байты будут позже скомбинированы в 64 - битное значение(тип uint64_t)
-    unsigned char hh[8];
+    unsigned char hh[8]{};
     // 0-255 shuffled in any (random) order suffices
     static const unsigned char T[256] = {
          98,  6, 85,150, 36, 23,112,164,135,207,169,  5, 26, 64,165,219, //  1
@@ -88,19 +96,15 @@ uint64_t HashMap::Hash(const string& key, size_t hash_size)
     }
 
     uint64_t result = 0;
-    size_t bytes_to_use = hash_size / 8;  // Количество байтов, которые будут использоваться для хеша
+    int bytes_to_use = hash_size / 8;  // Количество байтов, которые будут использоваться для хеша
+    int residue = hash_size % 8;
 
-    // Для хеша меньшего чем 8 бит, мы будем использовать маски
-    if (hash_size < 8) {
-        // Получаем только первые несколько бит
-        result = hh[0] & ((1 << hash_size) - 1);  // Маскируем только первые нужные биты
+    for (int k = 0; k < bytes_to_use; ++k) {
+        result = (result << 8) | hh[k];
     }
-    else {
-        // Если хеш 8 бит или больше, используем первые 8 бит
-        for (size_t k = 0; k < bytes_to_use; ++k) {
-            // Используем побитовый оператор исключающего и включающего ИЛИ
-            result = (result << 8) | hh[k];
-        }
+
+    if (residue > 0) {
+        result = (result << residue) | (hh[bytes_to_use] & ((1 << residue) - 1));
     }
 
     return result;
@@ -110,7 +114,19 @@ void HashMap::Rehash()
 {
     int oldCapacity = GetCapacity();
     List** oldBuckets = GetBuckets();
-    int newCapacity = oldCapacity * 2;
+    int newCapacity;
+    if (GetElementCount() / oldCapacity > 0.9)
+    {
+        newCapacity = oldCapacity * 2;
+    }
+    else if (GetElementCount() / oldCapacity < 0.45)
+    {
+        newCapacity = oldCapacity / 2;
+    }
+    else
+    {
+        return;
+    }
     SetCapacity(newCapacity);
 
     List** newBuckets = new List * [newCapacity];
@@ -152,10 +168,21 @@ void HashMap::Insert(Entry* entry)
         buckets[insertIndex] = new List();
     }
 
-    Node** prevFoundNodes = buckets[insertIndex]->LinearSearch(entry->Key);
-    Node* foundNode = prevFoundNodes[1];
+    bool isFinded = false;
+    Node* prevNode = nullptr;
+    Node* foundNode = buckets[insertIndex]->GetHead();
+    for (int i = 0; i < buckets[insertIndex]->GetCount(); i++)
+    {
+        if (foundNode->GetData()->Key == entry->Key)
+        {
+            isFinded = true;
+            break;
+        }
+        prevNode = foundNode;
+        foundNode = foundNode->GetNext();
+    }
 
-    if (foundNode)
+    if (isFinded)
     {
         if (foundNode->GetData()->Value == entry->Value)
         {
@@ -163,16 +190,15 @@ void HashMap::Insert(Entry* entry)
         }
         else
         {
-            buckets[insertIndex]->Remove(prevFoundNodes);
+            buckets[insertIndex]->Remove(prevNode, foundNode);
             buckets[insertIndex]->Add(entry);
         }
-        delete[] prevFoundNodes;
         return;
     }
     buckets[insertIndex]->Add(entry);
 
     SetElementCount(GetElementCount() + 1);
-    if (GetElementCount() / capacity + 0.15 > 1.0)
+    if (GetElementCount() / capacity > 0.9)
     {
         Rehash();
     }
@@ -188,7 +214,13 @@ void HashMap::Remove(string key)
     GetBuckets()[targetIndex]->Remove(key);
     if (!GetBuckets()[targetIndex]->GetCount())
     {
+        delete GetBuckets()[targetIndex];
         GetBuckets()[targetIndex] = nullptr;
+    }
+    SetElementCount(GetElementCount() - 1);
+    if (GetElementCount() / capacity < 0.45 && capacity >= 8)
+    {
+        Rehash();
     }
 }
 
@@ -197,13 +229,29 @@ string HashMap::Find(string key)
     int capacity = GetCapacity();
     size_t hash_size = (size_t)log2(capacity);
     uint64_t targetIndex = Hash(key, hash_size);
-    Node** result = GetBuckets()[targetIndex]->LinearSearch(key);
-    if (result[1])
+    if (!GetBuckets()[targetIndex]) throw invalid_argument("Element '" + key + "' not found.");
+
+    bool isFinded = false;
+    Node* prevNode = nullptr;
+    Node* foundNode = GetBuckets()[targetIndex]->GetHead();
+    for (int i = 0; i < GetBuckets()[targetIndex]->GetCount(); i++)
     {
-        return result[1]->GetData()->Value;
+        if (foundNode->GetData()->Key == key)
+        {
+            isFinded = true;
+            break;
+        }
+        prevNode = foundNode;
+        foundNode = foundNode->GetNext();
+    }
+
+    if (isFinded)
+    {
+        string value = foundNode->GetData()->Value;
+        return value;
     }
     else
     {
-        throw new invalid_argument("Element '" + key + "' not found.");
+        throw invalid_argument("Element '" + key + "' not found.");
     }
 }

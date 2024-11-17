@@ -11,11 +11,11 @@ private:
 	int GetElementCount() const { return _elementCount; };
 	void SetElementCount(int newElementCount);
 	void SetBuckets(List** newBuckets) { _buckets = newBuckets; };
-	uint64_t Hash(const string& key, size_t hash_size);
 public:
 	HashMap();
 	~HashMap();
 
+	uint64_t Hash(const string& key, int hash_size);
 	int GetCapacity() const { return _capacity; };
 	List** GetBuckets() const { return _buckets; };
 	void Insert(Entry* entry);

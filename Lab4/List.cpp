@@ -46,12 +46,26 @@ void List::Add(Entry* data)
 		tailNode->SetNext(newNode);
 		SetTail(newNode);
 	}
+
+	//Node* headNode = GetHead();
+	//Node* tailNode = GetTail();
+	//Node* newNode = new Node(data, nullptr);
+	//AddOffsetCount(1);
+
+	//if (!headNode)  // Если список пустой
+	//{
+	//	SetHead(newNode);
+	//	SetTail(newNode);  // Добавить эту строку
+	//}
+	//else  // Если в списке есть элементы
+	//{
+	//	GetTail()->SetNext(newNode);
+	//	SetTail(newNode);
+	//}
 }
 
-void List::Remove(Node** prevTargetNodes)
+void List::Remove(Node* prevNode, Node* targetNode)
 {
-	Node* prevNode = prevTargetNodes[0];
-	Node* targetNode = prevTargetNodes[1];
 	if (!targetNode)
 	{
 		return;
@@ -84,66 +98,25 @@ void List::Remove(Node** prevTargetNodes)
 		prevNode->SetNext(nextNode);
 	}
 
+	delete targetNode->GetData();
 	delete targetNode;
 	AddOffsetCount(-1);
 }
 
 void List::Remove(string key)
 {
-	Node** prevTargetNodes = LinearSearch(key);
-	Node* prevNode = prevTargetNodes[0];
-	Node* targetNode = prevTargetNodes[1];
-	if (!targetNode)
-	{
-		delete[] prevTargetNodes;
-		return;
-	}
-	Node* nextNode = targetNode->GetNext();
-
-	if (!prevNode && !nextNode)
-	{
-		SetHead(nullptr);
-		SetTail(nullptr);
-	}
-	else if (!prevNode)
-	{
-		SetHead(nextNode);
-		if (nextNode == GetTail())
-		{
-			SetTail(nullptr);
-		}
-	}
-	else if (!nextNode)
-	{
-		prevNode->SetNext(nullptr);
-		if (targetNode != GetHead())
-		{
-			SetTail(prevNode);
-		}
-	}
-	else
-	{
-		prevNode->SetNext(nextNode);
-	}
-
-	delete targetNode;
-	delete[] prevTargetNodes;
-	AddOffsetCount(-1);
-}
-
-Node** List::LinearSearch(string key)
-{
 	Node* prevNode = nullptr;
-	Node* currentNode = GetHead();
-	for (int i = 0; i < GetCount(); i++)
-	{
-		if (currentNode->GetData()->Key == key)
-		{
-			return new Node * [2] { prevNode, currentNode };
-		}
-		prevNode = currentNode;
-		currentNode = currentNode->GetNext();
-	}
+	Node* targetNode = GetHead();
 
-	return new Node * [2] { nullptr, nullptr };
+	while (targetNode != nullptr) // Изменение здесь
+	{
+		if (targetNode->GetData()->Key == key)
+		{
+			// Используем существующий метод Remove для удаления узла
+			Remove(prevNode, targetNode);
+			return;
+		}
+		prevNode = targetNode;
+		targetNode = targetNode->GetNext();
+	}
 }
