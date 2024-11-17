@@ -19,8 +19,8 @@ public:
 	int GetCapacity() const { return _capacity; };
 	List** GetBuckets() const { return _buckets; };
 	void Insert(Entry* entry);
-	string Find(string key);
 	void Remove(string key);
+	string Find(string key);
 	void Rehash();
 };
 

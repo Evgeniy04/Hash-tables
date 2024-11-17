@@ -177,3 +177,33 @@ void HashMap::Insert(Entry* entry)
         Rehash();
     }
 }
+
+
+void HashMap::Remove(string key)
+{
+    int capacity = GetCapacity();
+    size_t hash_size = (size_t)log2(capacity);
+    uint64_t targetIndex = Hash(key, hash_size);
+    if (!GetBuckets()[targetIndex]) return;
+    GetBuckets()[targetIndex]->Remove(key);
+    if (!GetBuckets()[targetIndex]->GetCount())
+    {
+        GetBuckets()[targetIndex] = nullptr;
+    }
+}
+
+string HashMap::Find(string key)
+{
+    int capacity = GetCapacity();
+    size_t hash_size = (size_t)log2(capacity);
+    uint64_t targetIndex = Hash(key, hash_size);
+    Node** result = GetBuckets()[targetIndex]->LinearSearch(key);
+    if (result[1])
+    {
+        return result[1]->GetData()->Value;
+    }
+    else
+    {
+        throw new invalid_argument("Element '" + key + "' not found.");
+    }
+}

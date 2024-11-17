@@ -49,5 +49,7 @@ int main()
 	hashMap->Insert(new Entry("a", "value"));
 	hashMap->Insert(new Entry("c", "12"));
 	hashMap->Insert(new Entry("d", "qwe"));
+	hashMap->Remove("a");
 	PrintHashMap(hashMap);
+	cout << hashMap->Find("d");
 }
