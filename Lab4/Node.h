@@ -17,6 +17,10 @@ public:
 	/// <param name="data">Запись (ключ-значение).</param>
 	/// <param name="next">Следующий узел.</param>
 	Node(Entry* data, Node* next);
+	/// <summary>
+	/// Деструктор.
+	/// </summary>
+	~Node();
 
 	/// <summary>
 	/// Получить запись (ключ-значение).

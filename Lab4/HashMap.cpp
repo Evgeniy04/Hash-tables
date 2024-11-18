@@ -23,10 +23,6 @@ HashMap::~HashMap()
 	delete[] GetBuckets();
 }
 
-/// <summary>
-/// Сеттер Capacity.
-/// </summary>
-/// <param name="newCapacity">Целое не отрицательное число, степень 2.</param>
 void HashMap::SetCapacity(int newCapacity)
 {
 	if (newCapacity < 0 && floor(log2(newCapacity)) != log2(newCapacity))
@@ -45,12 +41,6 @@ void HashMap::SetElementCount(int newElementCount)
 	_elementCount = newElementCount;
 }
 
-/// <summary>
-/// Хеш-функция.
-/// </summary>
-/// <param name="key">Значение, которое необходимо захешировать.</param>
-/// <param name="hash_size">Длину результирующего хеш-значения в битах.</param>
-/// <returns>Индекс массива, куда поместить элемент.</returns>
 uint64_t HashMap::Hash(const string& key, int hash_size)
 {
     if (hash_size < 0 || hash_size > 64)
@@ -116,11 +106,11 @@ void HashMap::Rehash()
     int oldCapacity = GetCapacity();
     List** oldBuckets = GetBuckets();
     int newCapacity;
-    if (GetElementCount() / oldCapacity > 0.9)
+    if ((double)GetElementCount() / oldCapacity > 0.9)
     {
         newCapacity = oldCapacity * 2;
     }
-    else if (GetElementCount() / oldCapacity < 0.45)
+    else if ((double)GetElementCount() / oldCapacity < 0.45)
     {
         newCapacity = oldCapacity / 2;
     }
@@ -140,14 +130,14 @@ void HashMap::Rehash()
         while (currentNode != nullptr)
         {
             Entry* entry = currentNode->GetData();
-            size_t hash_size = (size_t)log2(newCapacity);
+            int hash_size = (int)log2(newCapacity);
             uint64_t newInsertIndex = Hash(entry->Key, hash_size);
 
             if (!newBuckets[newInsertIndex])
             {
                 newBuckets[newInsertIndex] = new List();
             }
-            newBuckets[newInsertIndex]->Add(entry);
+            newBuckets[newInsertIndex]->Add(new Entry(entry->Key, entry->Value));
 
             currentNode = currentNode->GetNext();
         }
@@ -160,7 +150,7 @@ void HashMap::Rehash()
 void HashMap::Insert(Entry* entry)
 {
     int capacity = GetCapacity();
-    size_t hash_size = (size_t)log2(capacity);
+    int hash_size = (int)log2(capacity);
     uint64_t insertIndex = Hash(entry->Key, hash_size);
     List** buckets = GetBuckets();
 
@@ -199,7 +189,7 @@ void HashMap::Insert(Entry* entry)
     buckets[insertIndex]->Add(entry);
 
     SetElementCount(GetElementCount() + 1);
-    if (GetElementCount() / capacity > 0.9)
+    if ((double)GetElementCount() / capacity > 0.9)
     {
         Rehash();
     }
@@ -209,7 +199,7 @@ void HashMap::Insert(Entry* entry)
 void HashMap::Remove(string key)
 {
     int capacity = GetCapacity();
-    size_t hash_size = (size_t)log2(capacity);
+    int hash_size = (int)log2(capacity);
     uint64_t targetIndex = Hash(key, hash_size);
     if (!GetBuckets()[targetIndex]) return;
     GetBuckets()[targetIndex]->Remove(key);
@@ -219,7 +209,7 @@ void HashMap::Remove(string key)
         GetBuckets()[targetIndex] = nullptr;
     }
     SetElementCount(GetElementCount() - 1);
-    if (GetElementCount() / capacity < 0.45 && capacity >= 8)
+    if ((double)GetElementCount() / capacity < 0.45 && capacity >= 8)
     {
         Rehash();
     }
@@ -228,7 +218,7 @@ void HashMap::Remove(string key)
 string HashMap::Find(string key)
 {
     int capacity = GetCapacity();
-    size_t hash_size = (size_t)log2(capacity);
+    int hash_size = (int)log2(capacity);
     uint64_t targetIndex = Hash(key, hash_size);
     if (!GetBuckets()[targetIndex]) throw invalid_argument("Element '" + key + "' not found.");
 

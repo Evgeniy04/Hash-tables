@@ -82,7 +82,6 @@ void List::Remove(Node* prevNode, Node* targetNode)
 		prevNode->SetNext(nextNode);
 	}
 
-	delete targetNode->GetData();
 	delete targetNode;
 	AddOffsetCount(-1);
 }
@@ -102,4 +101,19 @@ void List::Remove(string key)
 		prevNode = targetNode;
 		targetNode = targetNode->GetNext();
 	}
+}
+
+string* List::GetValues() const
+{
+	int count = GetCount();
+	string* values = new string[count];
+
+	Node* currentNode = GetHead();
+	for (int i = 0; i < count; ++i)
+	{
+		values[i] = currentNode->GetData()->Key + ": " + currentNode->GetData()->Value + "; ";
+		currentNode = currentNode->GetNext();
+	}
+
+	return values;
 }

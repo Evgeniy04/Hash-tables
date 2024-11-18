@@ -12,9 +12,17 @@ private:
 	List** _buckets;
 
 	/// <summary>
-	/// Изменить количество бакетов. 
+	/// Хеш-функция.
 	/// </summary>
-	/// <param name="newCapacity">Новое количество бакетов.</param>
+	/// <param name="key">Значение, которое необходимо захешировать.</param>
+	/// <param name="hash_size">Длина результирующего хеш-значения в битах.</param>
+	/// <returns>Значение от 0 до 2^hash_size.</returns>
+	uint64_t Hash(const string& key, int hash_size);
+
+	/// <summary>
+	/// Сеттер Capacity.
+	/// </summary>
+	/// <param name="newCapacity">Целое не отрицательное число, степень 2.</param>
 	void SetCapacity(int newCapacity);
 
 	/// <summary>
@@ -46,14 +54,6 @@ public:
 	/// Деструктор.
 	/// </summary>
 	~HashMap();
-
-	/// <summary>
-	/// Хеш-функция.
-	/// </summary>
-	/// <param name="key">Строка, которая должна быть захеширована.</param>
-	/// <param name="hash_size">Размер хеша в битах.</param>
-	/// <returns>Значение от 0 до 2^hash_size.</returns>
-	uint64_t Hash(const string& key, int hash_size);
 
 	/// <summary>
 	/// Получить количество бакетов.

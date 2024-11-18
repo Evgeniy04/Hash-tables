@@ -83,5 +83,11 @@ public:
 	/// <param name="prevNode">Предыдущий узел.</param>
 	/// <param name="targetNode">Узел, который необходимо удалить.</param>
 	void Remove(Node* prevNode, Node* targetNode);
+
+	/// <summary>
+	/// Получить массива, где каждая строка содержит ключ и значение узла.
+	/// </summary>
+	/// <returns>Указатель на первый элемент массива, где каждая строка содержит ключ и значение узла.</returns>
+	string* GetValues() const;
 };
 
