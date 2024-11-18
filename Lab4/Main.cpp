@@ -91,14 +91,12 @@ void TestForHash(HashMap* hashMap)
 		cout << hashMap->Hash("abc", -1) << endl;
 	}
 	catch (const invalid_argument& e) {
-		// Ожидаемое исключение
 		cout << e.what() << '\n';
 	}
 	try {
 		cout << hashMap->Hash("abc", 65) << endl;
 	}
 	catch (const invalid_argument& e) {
-		// Ожидаемое исключение
 		cout << e.what() << '\n';
 	}
 
@@ -107,7 +105,6 @@ void TestForHash(HashMap* hashMap)
 		cout << hashMap->Hash("", 32) << endl;
 	}
 	catch (const invalid_argument& e) {
-		// Ожидаемое исключение
 		cout << e.what() << '\n';
 	}
 
@@ -128,7 +125,6 @@ void TestForHash(HashMap* hashMap)
 		cout << hashMap->Hash("", 0) << endl;               // Пустой ключ, минимальный hash_size
 	}
 	catch (const invalid_argument& e) {
-		// Ожидаемое исключение
 		cout << e.what() << '\n';
 	}
 	cout << hashMap->Hash("abcdefghijklmnopqrstuvwxyz", 64) << endl; // Максимальный ключ, максимальный hash_size
@@ -155,7 +151,7 @@ void TestForHashMap(HashMap& hashMap)
 	hashMap.Insert(new Entry("key", "value1"));
 	hashMap.Insert(new Entry("key", "value2"));
 
-	ASSERT(hashMap.Find("key") == "value2"); // Значение должно обновиться
+	ASSERT(hashMap.Find("key") == "value2");
 
 	// Длинные ключ и значение
 	std::string longKey(1000, 'a');
@@ -185,7 +181,7 @@ void TestForHashMap(HashMap& hashMap)
 		hashMap.Find("nonexistent_key");
 	}
 	catch (const std::invalid_argument& e) {
-		ASSERT(true); // Исключение ожидается
+		ASSERT(true);
 	}
 	PrintHashMap(&hashMap);
 }
@@ -240,66 +236,6 @@ int main()
 				}
 				break;
 			}
-			/*case 4:
-			{
-				for (int i = 0; i < 1000000; ++i) {
-					hashMap->Insert(new Entry("key" + std::to_string(i), "value" + std::to_string(i)));
-				}
-				break;
-			}
-			case 5:
-			{
-				for (int i = 0; i < 1000000; ++i) {
-					hashMap->Remove("key" + std::to_string(i));
-				}
-				break;
-			}
-			case 6:
-			{
-				for (int i = 0; i < 500000; ++i) {
-					list->Add(new Entry("key" + std::to_string(i), "value" + std::to_string(i)));
-				}
-				int result = 0;
-				Node* currentNode = list->GetHead();
-				while (currentNode)
-				{
-					result++;
-					Node* temp = currentNode->GetNext();
-					currentNode = temp;
-				}
-
-				cout << result;
-				break;
-			}
-			case 7:
-			{
-				int result = 0;
-				Node* currentNode = list->GetHead();
-				while (currentNode)
-				{
-					result++;
-					Node* temp = currentNode->GetNext();
-					currentNode = temp;
-				}
-
-				cout << result;
-				for (int i = 0; i < 500000; ++i) {
-					list->Remove("key" + std::to_string(i));
-				}
-
-
-				result = 0;
-				currentNode = list->GetHead();
-				while (currentNode)
-				{
-					result++;
-					Node* temp = currentNode->GetNext();
-					currentNode = temp;
-				}
-
-				cout << result;
-				break;
-			}*/
 			case 0:
 			{
 				flag = false;

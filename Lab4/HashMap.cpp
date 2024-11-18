@@ -96,7 +96,8 @@ uint64_t HashMap::Hash(const string& key, int hash_size)
     }
 
     uint64_t result = 0;
-    int bytes_to_use = hash_size / 8;  // Количество байтов, которые будут использоваться для хеша
+    // Количество байтов, которые будут использоваться для хеша
+    int bytes_to_use = hash_size / 8;
     int residue = hash_size % 8;
 
     for (int k = 0; k < bytes_to_use; ++k) {

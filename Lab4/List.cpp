@@ -46,22 +46,6 @@ void List::Add(Entry* data)
 		tailNode->SetNext(newNode);
 		SetTail(newNode);
 	}
-
-	//Node* headNode = GetHead();
-	//Node* tailNode = GetTail();
-	//Node* newNode = new Node(data, nullptr);
-	//AddOffsetCount(1);
-
-	//if (!headNode)  // Если список пустой
-	//{
-	//	SetHead(newNode);
-	//	SetTail(newNode);  // Добавить эту строку
-	//}
-	//else  // Если в списке есть элементы
-	//{
-	//	GetTail()->SetNext(newNode);
-	//	SetTail(newNode);
-	//}
 }
 
 void List::Remove(Node* prevNode, Node* targetNode)
@@ -108,11 +92,10 @@ void List::Remove(string key)
 	Node* prevNode = nullptr;
 	Node* targetNode = GetHead();
 
-	while (targetNode != nullptr) // Изменение здесь
+	while (targetNode != nullptr)
 	{
 		if (targetNode->GetData()->Key == key)
 		{
-			// Используем существующий метод Remove для удаления узла
 			Remove(prevNode, targetNode);
 			return;
 		}
