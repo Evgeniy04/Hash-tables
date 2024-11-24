@@ -2,7 +2,6 @@
 #include <sstream>
 #include "HashMap.h"
 #include "List.h"
-#include "Entry.h"
 
 using namespace std;
 
@@ -100,7 +99,7 @@ int main()
 				string key = CinString();
 				cout << "[1] Enter the value: ";
 				string value = CinString();
-				hashMap->Insert(new Entry(key, value));
+				hashMap->Insert(key, value);
 				break;
 			}
 			case 2:

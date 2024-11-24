@@ -147,8 +147,9 @@ void HashMap::Rehash()
     SetBuckets(newBuckets);
 }
 
-void HashMap::Insert(Entry* entry)
+void HashMap::Insert(string key, string value)
 {
+    Entry* entry = new Entry(key, value);
     int capacity = GetCapacity();
     int hash_size = (int)log2(capacity);
     uint64_t insertIndex = Hash(entry->Key, hash_size);

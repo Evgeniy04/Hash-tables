@@ -71,7 +71,7 @@ public:
 	/// Вставить запись.
 	/// </summary>
 	/// <param name="entry">Запись.</param>
-	void Insert(Entry* entry);
+	void Insert(string key, string value);
 
 	/// <summary>
 	/// Удалить запись.
