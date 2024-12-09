@@ -43,6 +43,11 @@ private:
 	/// <param name="newBuckets">Новый массив бакетов.</param>
 	void SetBuckets(List** newBuckets) { _buckets = newBuckets; };
 
+	/// <summary>
+	/// Функция перехеширования.
+	/// </summary>
+	void Rehash();
+
 public:
 
 	/// <summary>
@@ -85,10 +90,5 @@ public:
 	/// <param name="key">Ключ записи.</param>
 	/// <returns>Значение записи.</returns>
 	string Find(string key);
-
-	/// <summary>
-	/// Функция перехеширования.
-	/// </summary>
-	void Rehash();
 };
 
